@@ -1,5 +1,5 @@
 
-<p align="center"><img src="/art/header.png" alt="Social Card of Lighty Storage"></p>
+<p align="center"><img src="/art/header.jpg" alt="Social Card of Lighty Storage"></p>
 
 # Lighty Storage 🗂️
 
