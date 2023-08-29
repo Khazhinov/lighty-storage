@@ -1,0 +1,95 @@
+version: '3.9'
+
+networks:
+  lighty-storage-network:
+    name: lighty-storage-network
+    driver: bridge
+  lighty-storage-databases-network:
+    name: lighty-storage-databases-network
+    driver: bridge
+
+volumes:
+  lighty-storage-redis-volume:
+  lighty-storage-postgres-database-volume:
+  lighty-storage-postgres-home-volume:
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/image/Dockerfile
+      args:
+        ENV: containerized
+    container_name: lighty-storage-api
+    restart: always
+    command: ["/app/docker/entrypoint/api.sh"]
+    ports: ["8000:80"]
+    environment:
+      PHP_POOL_NAME: "lighty-storage-api"
+    networks:
+      - lighty-storage-network
+      - lighty-storage-databases-network
+    depends_on:
+      - redis
+      - postgres
+
+  task:
+    build:
+      context: .
+      dockerfile: docker/image/Dockerfile
+      args:
+        ENV: containerized
+    container_name: lighty-storage-task
+    restart: always
+    command: ["/app/docker/entrypoint/task.sh"]
+    environment:
+      PHP_POOL_NAME: "lighty-storage-task"
+    networks:
+      - lighty-storage-network
+      - lighty-storage-databases-network
+    depends_on:
+      - redis
+      - postgres
+
+  queue:
+    build:
+      context: .
+      dockerfile: docker/image/Dockerfile
+      args:
+        ENV: containerized
+    container_name: lighty-storage-queue
+    restart: always
+    command: ["/app/docker/entrypoint/queue.sh"]
+    environment:
+      PHP_POOL_NAME: "lighty-storage-queue"
+    networks:
+      - lighty-storage-network
+      - lighty-storage-databases-network
+    depends_on:
+      - redis
+      - postgres
+
+  redis:
+    image: redislabs/rejson:2.4.3
+    container_name: lighty-storage-redis
+    restart: always
+    ports: ["6379:6379"]
+    volumes:
+      - lighty-storage-redis-volume:/data
+    networks:
+      - lighty-storage-databases-network
+
+  postgres:
+    image: postgres:15.2
+    container_name: lighty-storage-postgres
+    restart: always
+    ports: ["5432:5432"]
+    environment:
+      POSTGRES_DB: lighty-storage
+      POSTGRES_USER: lighty-storage
+      POSTGRES_PASSWORD: lighty-storage
+    volumes:
+      - lighty-storage-postgres-database-volume:/var/lib/postgresql/data
+      - lighty-storage-postgres-home-volume:/root
+    networks:
+      - lighty-storage-databases-network

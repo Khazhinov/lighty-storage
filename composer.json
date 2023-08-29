@@ -1,0 +1,91 @@
+{
+    "name": "khazhinov/laravel-api-skeleton",
+    "type": "project",
+    "description": "Project skeleton Laravel for API development.",
+    "keywords": ["framework", "laravel", "api", "crud"],
+    "license": "MIT",
+    "require": {
+        "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.2",
+        "khazhinov/laravel-lighty": "^11.0",
+        "laravel/framework": "^10.0",
+        "laravel/octane": "^2.0",
+        "laravel/sanctum": "^3.2",
+        "laravel/telescope": "^4.14",
+        "laravel/tinker": "^2.8",
+        "nyholm/psr7": "^1.5",
+        "spatie/data-transfer-object": "^3.8",
+        "spiral/roadrunner": "v2023.1.3",
+        "spiral/roadrunner-http": "^3.0.1",
+        "spiral/roadrunner-cli": "^2.5.0"
+    },
+    "require-dev": {
+        "barryvdh/laravel-ide-helper": "^2.13",
+        "fakerphp/faker": "^1.9.1",
+        "friendsofphp/php-cs-fixer": "^3.11",
+        "fruitcake/laravel-telescope-toolbar": "^1.3",
+        "laravel-lang/attributes": "^2.0",
+        "laravel-lang/lang": "^12.1",
+        "laravel-lang/publisher": "^14.3",
+        "laravel/pint": "^1.0",
+        "mockery/mockery": "^1.4.4",
+        "nunomaduro/collision": "^7.0",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-symfony": "^1.2",
+        "phpunit/phpunit": "^10.0",
+        "roave/security-advisories": "dev-latest",
+        "spatie/laravel-ignition": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.localhost', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi",
+            "@php artisan ide-helper:eloquent",
+            "@php artisan ide-helper:generate",
+            "@php artisan ide-helper:meta",
+            "vendor/bin/php-cs-fixer fix --config cs_dist.php --allow-risky=yes",
+            "@php artisan laravel-api-skeleton:post-install"
+        ],
+        "analyse": "vendor/bin/phpstan analyse --configuration phpstan.neon --no-progress",
+        "format": "vendor/bin/php-cs-fixer fix --config cs_dist.php --allow-risky=yes",
+        "helpers": [
+            "@php artisan ide-helper:eloquent",
+            "@php artisan ide-helper:generate",
+            "@php artisan ide-helper:meta",
+            "@php artisan ide-helper:models --write -R"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "dev",    "prefer-stable": true
+}
