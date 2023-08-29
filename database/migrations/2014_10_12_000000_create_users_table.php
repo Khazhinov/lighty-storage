@@ -14,11 +14,6 @@ return new class() extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary()->comment('Уникальный идентификатор пользователя');
-            $table->string('external_id')->nullable()->index()->comment('Идентификатор пользователя во внешней системе');
-
-            $table->uuid('created_by')->nullable()->index()->comment('Идентификатор пользователя, создавшего запись');
-            $table->uuid('updated_by')->nullable()->index()->comment('Идентификатор пользователя, создавшего запись');
-            $table->uuid('deleted_by')->nullable()->index()->comment('Идентификатор пользователя, создавшего запись');
 
             $table->string('name')->index()->comment('Имя пользователя');
             $table->string('email')->unique()->index()->comment('Email адрес пользователя');

@@ -7,7 +7,7 @@ return [
     'documentations' => [
         'latest' => [
             'info' => [
-                'title' => 'Laravel API Skeleton',
+                'title' => 'Lighty Storage',
                 'description' => 'Автоматическая документация для демонстрации возможностей экосистемы',
                 'version' => '1.0',
                 'contact' => null,

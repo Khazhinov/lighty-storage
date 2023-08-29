@@ -2,11 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace App\Http\Requests\ExampleEntity;
+namespace App\Http\Requests\Storage;
 
 use Khazhinov\LaravelLighty\Http\Requests\BaseRequest;
 
-final class ExampleEntityUpdateRequest extends BaseRequest
+final class StorageViewRequest extends BaseRequest
 {
     /**
      * @return array<string, mixed>
@@ -14,15 +14,13 @@ final class ExampleEntityUpdateRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'name' => [
+            'bucket' => [
                 'required',
                 'string',
-                'max:255',
             ],
-            'position' => [
-                'sometimes',
-                'int',
-                'min:0',
+            'path' => [
+                'required',
+                'string',
             ],
         ];
     }

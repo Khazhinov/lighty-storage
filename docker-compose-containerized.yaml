@@ -9,9 +9,55 @@ networks:
     driver: bridge
 
 volumes:
+  lighty-storage-minio-volume:
   lighty-storage-redis-volume:
   lighty-storage-postgres-database-volume:
   lighty-storage-postgres-home-volume:
+
+x-common-variables: &common-variables
+  APP_NAME: "Lighty Storage"
+  APP_ENV: local
+  APP_KEY: "base64:flDIzh18CdejPFzeyCO6k4FrtmB5XPKJl5Sz6/chLVk="
+  APP_DEBUG: true
+  APP_URL: http://localhost:8000
+
+  LOG_CHANNEL: stack
+  LOG_DEPRECATIONS_CHANNEL: null
+  LOG_LEVEL: debug
+
+  DB_CONNECTION: pgsql
+  DB_HOST: postgres
+  DB_PORT: 5432
+  DB_DATABASE: lighty-storage
+  DB_USERNAME: lighty-storage
+  DB_PASSWORD: lighty-storage
+
+  BROADCAST_DRIVER: redis
+  CACHE_DRIVER: file
+  FILESYSTEM_DISK: local
+  QUEUE_CONNECTION: redis
+  SESSION_DRIVER: redis
+  SESSION_LIFETIME: 120
+
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: null
+
+  MAIL_MAILER: smtp
+  MAIL_HOST: mailhog
+  MAIL_PORT: 1025
+  MAIL_USERNAME: null
+  MAIL_PASSWORD: null
+  MAIL_ENCRYPTION: null
+  MAIL_FROM_ADDRESS: "hello@example.com"
+  MAIL_FROM_NAME: "${APP_NAME}"
+
+  MINIO_KEY: lighty-storage
+  MINIO_SECRET: lighty-storage
+  MINIO_REGION: us-east-1
+  MINIO_MAIN_BUCKET: main
+  MINIO_ENDPOINT: http://minio:9000
+  MINIO_PUBLIC_ENDPOINT: http://localhost:9000
 
 services:
   api:
@@ -25,11 +71,13 @@ services:
     command: ["/app/docker/entrypoint/api.sh"]
     ports: ["8000:80"]
     environment:
+      <<: *common-variables
       PHP_POOL_NAME: "lighty-storage-api"
     networks:
       - lighty-storage-network
       - lighty-storage-databases-network
     depends_on:
+      - minio
       - redis
       - postgres
 
@@ -43,6 +91,7 @@ services:
     restart: always
     command: ["/app/docker/entrypoint/task.sh"]
     environment:
+      <<: *common-variables
       PHP_POOL_NAME: "lighty-storage-task"
     networks:
       - lighty-storage-network
@@ -61,6 +110,7 @@ services:
     restart: always
     command: ["/app/docker/entrypoint/queue.sh"]
     environment:
+      <<: *common-variables
       PHP_POOL_NAME: "lighty-storage-queue"
     networks:
       - lighty-storage-network
@@ -68,6 +118,19 @@ services:
     depends_on:
       - redis
       - postgres
+
+  minio:
+    image: bitnami/minio:2023.7.18
+    container_name: lighty-storage-minio
+    restart: always
+    ports: [ "9000:9000", "9001:9001" ]
+    environment:
+      MINIO_ROOT_USER: lighty-storage
+      MINIO_ROOT_PASSWORD: lighty-storage
+    volumes:
+      - lighty-storage-minio-volume:/data
+    networks:
+      - lighty-storage-network
 
   redis:
     image: redislabs/rejson:2.4.3

@@ -30,13 +30,16 @@ class InitCommand extends Command
      */
     public function handle(): int
     {
-        $this->components->info('Start migrations.');
+        $this->components->info('Начало инициализации.');
+        $this->components->info('Запуск миграций.');
 
         Artisan::call('migrate', [
             '--force' => true,
         ], outputBuffer: $this->output);
 
-        $this->components->info('Init complete.');
+        Artisan::call('service:init-main-bucket', outputBuffer: $this->output);
+
+        $this->components->info('Инициализация завершена.');
 
         return self::SUCCESS;
     }
