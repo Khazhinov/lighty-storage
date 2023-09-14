@@ -12,7 +12,7 @@ class MinIOPolicy
      * @param  array<string, mixed>  $policy
      */
     public function __construct(
-        protected array $policy,
+        public array $policy,
     ) {
     }
 

@@ -15,5 +15,5 @@ class FileDTO extends DataTransferObject
     public string $extension;
     public int $size;
     public string $url;
-//    public string $last_modified;
+    //    public string $last_modified;
 }

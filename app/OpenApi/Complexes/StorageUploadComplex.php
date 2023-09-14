@@ -3,11 +3,11 @@
 namespace App\OpenApi\Complexes;
 
 use App\OpenApi\Complexes\StorageUpload\StorageUploadArgumentsDTO;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\MediaType;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\RequestBody;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
 use Khazhinov\LaravelFlyDocs\Generator\Factories\ComplexFactory;
 use Khazhinov\LaravelFlyDocs\Generator\Factories\ComplexFactoryResult;
+use Khazhinov\LaravelFlyDocs\Generator\Objects\MediaTypeWithFormData;
 use Khazhinov\LaravelLighty\OpenApi\Complexes\Reflector\RequestReflector;
 use Khazhinov\LaravelLighty\OpenApi\Complexes\Responses\ErrorResponse;
 use Khazhinov\LaravelLighty\OpenApi\Complexes\Responses\SuccessSingleResourceResponse;
@@ -29,9 +29,23 @@ class StorageUploadComplex extends ComplexFactory
         $complex_result = new ComplexFactoryResult();
 
         $complex_result->request_body = RequestBody::create()->content(
-            MediaType::json()->schema(
+            MediaTypeWithFormData::formData()->schema(
                 Schema::object('')->properties(
-                    ...$request_reflector->getSchemaByRequest($arguments->validation_request)
+                    Schema::string('bucket')
+                        ->nullable(false)
+                        ->default('main')
+                        ->description('Название бакета.'),
+                    Schema::string('path')
+                        ->nullable(false)
+                        ->default('/')
+                        ->description('Путь в бакете.'),
+                    Schema::string('file')
+                        ->nullable(false)
+                        ->format('binary')
+                        ->description('Файл.'),
+                    Schema::string('name')
+                        ->nullable()
+                        ->description('Требуемое название файла.'),
                 )
             ),
         );

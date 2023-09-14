@@ -18,7 +18,6 @@ use App\OpenApi\Complexes\StorageViewComplex;
 use App\Services\MinIO\DTO\DirectoryDTO;
 use App\Services\MinIO\DTO\FileDTO;
 use App\Services\MinIO\MinIOService;
-use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use JsonException;
 use Khazhinov\LaravelFlyDocs\Generator\Attributes as OpenApi;
@@ -84,7 +83,6 @@ class StorageController extends ApiController
             'extension' => $uploaded_file->getClientOriginalExtension(),
             'size' => $uploaded_file->getSize(),
             'url' => $this->makeUrl($client->url($path.$name)),
-//            'last_modified' => Carbon::createFromTimestamp($client->lastModified($path.$name)),
         ]);
 
         return $this->respond(
@@ -179,7 +177,6 @@ class StorageController extends ApiController
                 'extension' => $fileExtension,
                 'size' => $client->size($path.$file),
                 'url' => $this->makeUrl($client->url($path.$file)),
-//                'last_modified' => Carbon::createFromTimestamp($client->lastModified($path.$file)),
             ]);
 
             $result[] = $_->toArray();
@@ -258,23 +255,23 @@ class StorageController extends ApiController
         $to = $request->get('to');
         $client = $this->storageService->getStorageClientForSpecifyBucket($bucket);
 
-//        $path = explode('/', $from);
-//        $file = array_pop($path);
-//        // Если нет расширения, значит папка
-//        if (! str_contains($file, '.')) {
-//            $path[] = $file;
-//            $file = "";
-//        }
-//        $path = implode('/', $path);
-//        $path = $this->normalizeStoragePath($path);
-//
-//        if ($result = $client->copy($from, $to)) {
-//            if ($file === "") {
-//                $result = $client->deleteDirectory($path);
-//            } else {
-//                $result = $client->delete($path.$file);
-//            }
-//        }
+        //        $path = explode('/', $from);
+        //        $file = array_pop($path);
+        //        // Если нет расширения, значит папка
+        //        if (! str_contains($file, '.')) {
+        //            $path[] = $file;
+        //            $file = "";
+        //        }
+        //        $path = implode('/', $path);
+        //        $path = $this->normalizeStoragePath($path);
+        //
+        //        if ($result = $client->copy($from, $to)) {
+        //            if ($file === "") {
+        //                $result = $client->deleteDirectory($path);
+        //            } else {
+        //                $result = $client->delete($path.$file);
+        //            }
+        //        }
 
         return $this->respond(
             $this->buildActionResponseDTO(
@@ -304,13 +301,13 @@ class StorageController extends ApiController
         $to = $request->get('to');
         $client = $this->storageService->getStorageClientForSpecifyBucket($bucket);
         $images = $client->allFiles($from);
-        $result=false;
+        $result = false;
 
-        if (empty($images)){
+        if (empty($images)) {
             $dirs = $client->allDirectories();
-            foreach ($dirs as $dir){
+            foreach ($dirs as $dir) {
                 $dir = '/' . $dir . '/';
-                if (str_starts_with($dir, $from. '/')){
+                if (str_starts_with($dir, $from. '/')) {
                     $new_dir = str_replace($from, $to, $dir);
                     $client->createDirectory($new_dir);
 
@@ -321,12 +318,11 @@ class StorageController extends ApiController
             }
 
         } else {
-            foreach($images as $image)
-            {
+            foreach($images as $image) {
                 $from_dir = trim($from, '/');
                 $new_loc = str_replace($from_dir, $to, $image);
 
-                if ($client->move($image, $new_loc)){
+                if ($client->move($image, $new_loc)) {
                     $result = true;
                 }
             }

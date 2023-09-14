@@ -2,18 +2,19 @@
 
 namespace App\OpenApi\Complexes;
 
-use App\OpenApi\Complexes\StorageMove\StorageMoveArgumentsDTO;
+use App\OpenApi\Complexes\DeleteBucket\DeleteBucketArgumentsDTO;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\MediaType;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\RequestBody;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
 use Khazhinov\LaravelFlyDocs\Generator\Factories\ComplexFactory;
 use Khazhinov\LaravelFlyDocs\Generator\Factories\ComplexFactoryResult;
+use Khazhinov\LaravelLighty\OpenApi\Complexes\Reflector\RequestReflector;
 use Khazhinov\LaravelLighty\OpenApi\Complexes\Responses\ErrorResponse;
 use Khazhinov\LaravelLighty\OpenApi\Complexes\Responses\SuccessResponse;
 use ReflectionException;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
-class StorageMoveComplex extends ComplexFactory
+class DeleteBucketComplex extends ComplexFactory
 {
     /**
      * @param  mixed  ...$arguments
@@ -23,26 +24,22 @@ class StorageMoveComplex extends ComplexFactory
      */
     public function build(...$arguments): ComplexFactoryResult
     {
-        $arguments = new StorageMoveArgumentsDTO($arguments);
+        $arguments = new DeleteBucketArgumentsDTO($arguments);
+        $request_reflector = new RequestReflector();
         $complex_result = new ComplexFactoryResult();
 
         $complex_result->request_body = RequestBody::create()->content(
             MediaType::json()->schema(
                 Schema::object('')->properties(
-                    Schema::string('bucket')->description('Идентификатор бакета'),
-                    Schema::string('from')->description('Текущий абсолютный путь к объекту (папке или файлу) относительно корня бакета')
-                        ->default('/текущий/путь/к/папке/или/файлу'),
-                    Schema::string('to')->description('Новый абсолютный путь к объекту (папке или файлу) относительно корня бакета')
-                        ->default('/новый/путь/к/папке/или/файлу'),
+                    ...$request_reflector->getSchemaByRequest($arguments->validation_request)
                 )
             ),
         );
 
         $complex_result->responses = [
             SuccessResponse::build(
-                data: [
-                    Schema::boolean('status')->default(true)->description('Статус выполнения перемещения'),
-                ],
+                data: 'ok',
+                data_type: 'string',
             ),
             ErrorResponse::build(),
         ];

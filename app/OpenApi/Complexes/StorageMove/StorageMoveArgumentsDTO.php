@@ -10,6 +10,6 @@ use Khazhinov\PhpSupport\DTO\Validation\ExistsInParents;
 
 class StorageMoveArgumentsDTO extends DataTransferObject
 {
-//    #[ExistsInParents(parent: BaseRequest::class)]
-//    public string $validation_request;
+    //    #[ExistsInParents(parent: BaseRequest::class)]
+    //    public string $validation_request;
 }

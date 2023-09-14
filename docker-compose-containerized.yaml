@@ -136,7 +136,7 @@ services:
     image: redislabs/rejson:2.4.3
     container_name: lighty-storage-redis
     restart: always
-    ports: ["6379:6379"]
+    ports: ["9763:6379"]
     volumes:
       - lighty-storage-redis-volume:/data
     networks:
@@ -146,7 +146,7 @@ services:
     image: postgres:15.2
     container_name: lighty-storage-postgres
     restart: always
-    ports: ["5432:5432"]
+    ports: ["5456:5432"]
     environment:
       POSTGRES_DB: lighty-storage
       POSTGRES_USER: lighty-storage

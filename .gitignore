@@ -17,4 +17,3 @@ yarn-error.log
 .php-cs-fixer.cache
 rr
 .rr.yaml
-composer.lock

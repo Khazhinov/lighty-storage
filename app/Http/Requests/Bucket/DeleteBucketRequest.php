@@ -6,7 +6,7 @@ namespace App\Http\Requests\Bucket;
 
 use Khazhinov\LaravelLighty\Http\Requests\BaseRequest;
 
-final class BucketUpdateRequest extends BaseRequest
+final class DeleteBucketRequest extends BaseRequest
 {
     /**
      * @return array<string, mixed>
@@ -15,15 +15,11 @@ final class BucketUpdateRequest extends BaseRequest
     {
         return [
             'name' => [
-                'sometimes',
+                'required',
                 'string',
-                'max:255',
-            ],
-            'size' => [
-                'sometimes',
-                'integer',
-                'min:1',
-                'max:100',
+                'min:3',
+                'max:63',
+                'regex:^([a-z]([a-z]|\d|\-|\.)+([a-z]|\d))$',
             ],
         ];
     }

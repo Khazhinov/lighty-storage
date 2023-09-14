@@ -19,13 +19,24 @@ Route::group([
     "prefix" => "/v1.0",
     "as" => "api.v1_0.",
 ], static function () {
-    # /api/v1.0/auth
+    //    # /api/v1.0/auth
+    //    Route::group([
+    //        "namespace" => "Auth",
+    //        "prefix" => "/auth",
+    //    ], static function () {
+    //        Route::post("/registration", "AuthController@registration")->name("registration");
+    //        Route::post("/login", "AuthController@login")->name("login");
+    //    });
+
+    #/api/v1.0/buckets
     Route::group([
-        "namespace" => "Auth",
-        "prefix" => "/auth",
+        "namespace" => "Bucket",
+        "prefix" => "/buckets",
+        "as" => "buckets.",
     ], static function () {
-        Route::post("/registration", "AuthController@registration")->name("registration");
-        Route::post("/login", "AuthController@login")->name("login");
+        Route::get("/list", "BucketCRUDController@bucketList")->name("bucket-list");
+        Route::post("/create", "BucketCRUDController@createBucket")->name("create-bucket");
+        Route::delete("/delete", "BucketCRUDController@deleteBucket")->name("delete-bucket");
     });
 
     #/api/v1.0/storage
@@ -41,42 +52,22 @@ Route::group([
         Route::post("/moveDirectory", "StorageController@moveDirectory")->name("moveDirectory");
         Route::delete("/delete", "StorageController@delete")->name("delete");
     });
-
-//    #/api/v1.0/buckets
-//    Route::group([
-//        "namespace" => "Bucket",
-//        "prefix" => "/buckets",
-//        "as" => "buckets.",
-//    ], static function () {
-//        Route::post("/search", "BucketCRUDController@index")->name("search");
-//
-//        Route::post("/", "BucketCRUDController@store")->name("store");
-//
-//        #/api/v2.0/buckets/:key
-//        Route::group([
-//            "prefix" => "/{key}",
-//        ], static function () {
-//            Route::get("/", "BucketCRUDController@show")->name("show");
-//            Route::put("/", "BucketCRUDController@update")->name("update");
-//            Route::delete("/", "BucketCRUDController@destroy")->name("destroy");
-//        });
-//    });
 });
 
 
 # /api/v1.0/
-Route::group([
-    "namespace" => "App\Http\Controllers\Api\V1_0",
-    "prefix" => "/v1.0",
-    "as" => "api.v1_0.",
-    "middleware" => ["auth:sanctum"],
-], static function () {
-    # /api/v1.0/auth
-    Route::group([
-        "namespace" => "Auth",
-        "prefix" => "/auth",
-    ], static function () {
-        Route::post("/logout", "AuthController@logout")->name("logout");
-        Route::get("/profile", "AuthController@profile")->name("profile");
-    });
-});
+//Route::group([
+//    "namespace" => "App\Http\Controllers\Api\V1_0",
+//    "prefix" => "/v1.0",
+//    "as" => "api.v1_0.",
+//    "middleware" => ["auth:sanctum"],
+//], static function () {
+//    # /api/v1.0/auth
+//    Route::group([
+//        "namespace" => "Auth",
+//        "prefix" => "/auth",
+//    ], static function () {
+//        Route::post("/logout", "AuthController@logout")->name("logout");
+//        Route::get("/profile", "AuthController@profile")->name("profile");
+//    });
+//});
