@@ -46,6 +46,7 @@ Route::group([
         "as" => "storage.",
     ], static function () {
         Route::post("/upload", "StorageController@upload")->name("upload");
+        Route::post("/simpleUpload", "StorageController@simpleUpload")->name("simple-upload");
         Route::post("/createDirectory", "StorageController@createDirectory")->name("create_directory");
         Route::post("/view", "StorageController@view")->name("view");
         Route::post("/move", "StorageController@move")->name("move");

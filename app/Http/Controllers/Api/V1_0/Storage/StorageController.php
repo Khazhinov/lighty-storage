@@ -7,14 +7,17 @@ namespace App\Http\Controllers\Api\V1_0\Storage;
 use App\Http\Requests\Storage\StorageCreateDirectoryRequest;
 use App\Http\Requests\Storage\StorageDeleteRequest;
 use App\Http\Requests\Storage\StorageMoveRequest;
+use App\Http\Requests\Storage\StorageSimpleUploadRequest;
 use App\Http\Requests\Storage\StorageUploadRequest;
 use App\Http\Requests\Storage\StorageViewRequest;
 use App\OpenApi\Complexes\StorageCreateDirectoryComplex;
 use App\OpenApi\Complexes\StorageDeleteComplex;
 use App\OpenApi\Complexes\StorageMoveComplex;
 use App\OpenApi\Complexes\StorageMoveDirectoryComplex;
+use App\OpenApi\Complexes\StorageSimpleUploadComplex;
 use App\OpenApi\Complexes\StorageUploadComplex;
 use App\OpenApi\Complexes\StorageViewComplex;
+use App\Services\MinIO\BucketTypeEnum;
 use App\Services\MinIO\DTO\DirectoryDTO;
 use App\Services\MinIO\DTO\FileDTO;
 use App\Services\MinIO\MinIOService;
@@ -76,14 +79,83 @@ class StorageController extends ApiController
             throw new UploadException('Не удалось загрузить файл на сервер.');
         }
 
+        if ($this->storageService->getBucketPolicy($bucket) === BucketTypeEnum::Public) {
+            $url = $this->makeUrl($client->url($path.$name));
+        } else {
+            $url = route('web.storage.download', [
+                'bucket' => $bucket,
+                'path' => $path,
+                'filename' => $name,
+            ]);
+        }
+
         $file = new FileDTO([
             'bucket' => $bucket,
             'path' => $path,
             'name' => $name,
             'extension' => $uploaded_file->getClientOriginalExtension(),
             'size' => $uploaded_file->getSize(),
-            'url' => $this->makeUrl($client->url($path.$name)),
+            'url' => $url,
         ]);
+
+        return $this->respond(
+            $this->buildActionResponseDTO(
+                data: $file->toArray(),
+            )
+        );
+    }
+
+    /**
+     * Загрузка файла в бакет с автоматической генерацией названия. Позволяет заливать один и тот же файл.
+     *
+     * @throws UnknownProperties
+     * @throws ReflectionException
+     * @throws JsonException
+     */
+    #[OpenApi\Operation(tags: ['Storage'])]
+    #[OpenApi\Complex(
+        factory: StorageSimpleUploadComplex::class,
+        validation_request: StorageSimpleUploadRequest::class,
+    )]
+    public function simpleUpload(StorageSimpleUploadRequest $request): Response
+    {
+        $bucket = $request->get('bucket');
+        $client = $this->storageService->getStorageClientForSpecifyBucket($bucket);
+        /** @var UploadedFile $uploaded_file */
+        $uploaded_file = $request->file('file');
+
+        $path = $this->normalizeStoragePath($request->get('path'));
+
+        $extension = $uploaded_file->getClientOriginalExtension();
+
+        $name = sprintf('%s.%s', md5((string) microtime(true)), $extension);
+
+        $upload_result = $client->putFileAs($path, $uploaded_file, $name);
+
+        if (! $upload_result) {
+            throw new UploadException('Не удалось загрузить файл на сервер.');
+        }
+
+
+        if ($this->storageService->getBucketPolicy($bucket) === BucketTypeEnum::Public) {
+            $url = $this->makeUrl($client->url($path.$name));
+        } else {
+            $url = route('web.storage.download', [
+                'bucket' => $bucket,
+                'path' => $path,
+                'filename' => $name,
+            ]);
+        }
+
+        $file = new FileDTO([
+            'bucket' => $bucket,
+            'path' => $path,
+            'name' => $name,
+            'extension' => $uploaded_file->getClientOriginalExtension(),
+            'size' => $uploaded_file->getSize(),
+            'url' => $url,
+        ]);
+
 
         return $this->respond(
             $this->buildActionResponseDTO(
@@ -170,13 +242,23 @@ class StorageController extends ApiController
             $fileExtension = explode('.', $file);
             $fileExtension = last($fileExtension);
 
+            if ($this->storageService->getBucketPolicy($bucket) === BucketTypeEnum::Public) {
+                $url = $this->makeUrl($client->url($path.$file));
+            } else {
+                $url = route('web.storage.download', [
+                    'bucket' => $bucket,
+                    'path' => $path,
+                    'filename' => $file,
+                ]);
+            }
+
             $_ = new FileDTO([
                 'bucket' => $bucket,
                 'path' => $path,
                 'name' => $file,
                 'extension' => $fileExtension,
                 'size' => $client->size($path.$file),
-                'url' => $this->makeUrl($client->url($path.$file)),
+                'url' => $url,
             ]);
 
             $result[] = $_->toArray();

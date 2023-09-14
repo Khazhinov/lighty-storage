@@ -16,3 +16,19 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+#/
+Route::group([
+    "namespace" => "App\Http\Controllers\Web",
+    "prefix" => "/",
+    "as" => "web.",
+], static function () {
+    #/storage
+    Route::group([
+        "namespace" => "Storage",
+        "prefix" => "/storage",
+        "as" => "storage.",
+    ], static function () {
+        Route::get("/download/{bucket}", "StorageController@download")->name("download");
+    });
+});
