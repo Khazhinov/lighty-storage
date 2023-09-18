@@ -41,8 +41,22 @@ class StorageController extends ApiController
         ]);
 
         $request = $client->createPresignedRequest($command, '+1 minute');
-        $result_url = (string) $request->getUri();
+        $result_url = $this->makeUrl((string) $request->getUri());
 
         return redirect($result_url);
+    }
+
+    protected function makeUrl(string $storage_url): string
+    {
+        /** @var string $storage_endpoint */
+        $storage_endpoint = config('filesystems.disks.minio.endpoint');
+        /** @var string $storage_public_endpoint */
+        $storage_public_endpoint = config('filesystems.disks.minio.public_endpoint');
+
+        return str_replace(
+            $storage_endpoint,
+            $storage_public_endpoint,
+            $storage_url
+        );
     }
 }
